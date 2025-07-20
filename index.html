@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -8,7 +8,7 @@
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: radial-gradient(circle at center, #0a0a23, #000000);
+      background: url('https://i.7fon.org/1000/w661517917.jpg') center/cover no-repeat fixed;
       color: white;
       overflow-x: hidden;
     }
@@ -18,6 +18,7 @@
       padding: 20px;
       font-size: 24px;
       font-weight: bold;
+      background: rgba(0, 0, 0, 0.6);
     }
 
     .card-container {
@@ -30,7 +31,7 @@
 
     .card {
       flex: 0 0 250px;
-      background: #111827;
+      background: rgba(0, 0, 0, 0.7);
       border-radius: 20px;
       padding: 20px;
       scroll-snap-align: start;
@@ -60,7 +61,7 @@
     .wallet-btn {
       margin: 20px auto;
       display: block;
-      background: #10b981;
+      background: #3b82f6;
       color: white;
       padding: 12px 24px;
       font-size: 16px;
@@ -68,11 +69,25 @@
       border-radius: 12px;
     }
 
+    .section {
+      padding: 20px;
+      background: rgba(0,0,0,0.5);
+      margin: 20px;
+      border-radius: 16px;
+    }
+
+    .referral-box, .leaderboard-box {
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+
     footer {
       position: fixed;
       bottom: 0;
       width: 100%;
-      background: #1f2937;
+      background: rgba(0, 0, 0, 0.7);
       display: flex;
       justify-content: space-around;
       padding: 10px 0;
@@ -82,7 +97,7 @@
       background: none;
       border: none;
       color: white;
-      font-size: 14px;
+      font-size: 20px;
     }
   </style>
 </head>
@@ -91,50 +106,82 @@
 
   <div class="card-container">
     <div class="card">
-      <img src="https://cryptologos.cc/logos/toncoin-ton-logo.png" class="coin-icon"/>
+      <img src="https://ton.org/download/ton_symbol.png" class="coin-icon"/>
       <div class="stake-info">
         <strong>TON Staking</strong><br/>
         8% за 4 дня<br/>
         <small>от 1 TON</small>
       </div>
-      <button class="stake-button">Stake now</button>
+      <button class="stake-button">Стейкать</button>
     </div>
     <div class="card">
-      <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" class="coin-icon"/>
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/2048px-Bitcoin.svg.png" class="coin-icon"/>
       <div class="stake-info">
-        <strong>Bitcoin Staking</strong><br/>
+        <strong>BTC Staking</strong><br/>
         5% за 5 дней<br/>
         <small>от 0.001 BTC</small>
       </div>
-      <button class="stake-button">Stake now</button>
+      <button class="stake-button">Стейкать</button>
     </div>
     <div class="card">
-      <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" class="coin-icon"/>
+      <img src="https://images.seeklogo.com/logo-png/32/1/tether-usdt-logo-png_seeklogo-323175.png" class="coin-icon"/>
       <div class="stake-info">
         <strong>USDT Staking</strong><br/>
         7% за 6 дней<br/>
         <small>от 10 USDT</small>
       </div>
-      <button class="stake-button">Stake now</button>
+      <button class="stake-button">Стейкать</button>
     </div>
     <div class="card">
-      <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/29396.png" class="coin-icon"/>
+      <img src="https://www.shutterstock.com/image-vector/notcoin-logo-inside-black-circle-260nw-2486263053.jpg" class="coin-icon"/>
       <div class="stake-info">
-        <strong>Notcoin</strong><br/>
+        <strong>Notcoin Staking</strong><br/>
         10% за 3 дня<br/>
         <small>от 1000 NOT</small>
       </div>
-      <button class="stake-button">Stake now</button>
+      <button class="stake-button">Стейкать</button>
     </div>
   </div>
 
-  <button class="wallet-btn">🔗 Подключить Telegram Wallet</button>
+  <button class="wallet-btn" onclick="connectWallet()">🔗 Подключить Telegram Wallet</button>
+
+  <div class="section">
+    <h3>📊 Последние процессы</h3>
+    <div class="referral-box">Пользователь @user1 начал стейкинг TON</div>
+    <div class="referral-box">Пользователь @user2 начал стейкинг BTC</div>
+  </div>
+
+  <div class="section">
+    <h3>🏆 Топ 10 Лидеров</h3>
+    <div class="leaderboard-box">1. @alpha - 1000 TON</div>
+    <div class="leaderboard-box">2. @beta - 800 TON</div>
+    <div class="leaderboard-box">3. @gamma - 700 TON</div>
+    <div class="leaderboard-box">4. @delta - 600 TON</div>
+    <div class="leaderboard-box">5. @omega - 550 TON</div>
+    <div class="leaderboard-box">6. @zulu - 500 TON</div>
+    <div class="leaderboard-box">7. @echo - 450 TON</div>
+    <div class="leaderboard-box">8. @novax - 400 TON</div>
+    <div class="leaderboard-box">9. @lambda - 350 TON</div>
+    <div class="leaderboard-box">10. @theta - 300 TON</div>
+  </div>
+
+  <div class="section">
+    <h3>🤝 Рефералы</h3>
+    <div class="referral-box">Вы пригласили: <strong>5</strong> человек</div>
+    <button class="stake-button">🔗 Поделиться ссылкой</button>
+  </div>
 
   <footer>
-    <button>🏠 Главная</button>
-    <button>💸 Заработок</button>
-    <button>👥 Рефералы</button>
-    <button>🏆 Лидеры</button>
+    <button><img src="https://images.icon-icons.com/1144/PNG/512/homepage_80953.png" width="30"/></button>
+    <button><img src="https://cdn-icons-png.flaticon.com/512/3594/3594376.png" width="30"/></button>
+    <button><img src="https://cdn-icons-png.flaticon.com/512/1953/1953403.png" width="30"/></button>
+    <button><img src="https://cdn-icons-png.flaticon.com/512/2502/2502806.png" width="30"/></button>
   </footer>
+
+  <script>
+    function connectWallet() {
+      alert('Функция подключения кошелька будет реализована позже.');
+    }
+  </script>
 </body>
 </html>
