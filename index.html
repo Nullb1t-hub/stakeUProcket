@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>StakeUP Rocket</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
@@ -20,10 +23,9 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: url('https://i.pinimg.com/originals/57/34/f4/5734f437987f7ce2f9ccfc6645fcb5ae.gif') center/cover no-repeat;
+      background: url('https://i.pinimg.com/originals/70/e3/57/70e357fa3910be3d3e91d70278a85b64.gif') center/cover no-repeat;
       z-index: -1;
-      animation: stars 60s linear infinite;
-      opacity: 0.4;
+      opacity: 0.5;
     }
 
     header {
@@ -34,11 +36,37 @@
       background: rgba(0, 0, 0, 0.6);
     }
 
+    .wallet-info {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 14px;
+      color: #aaa;
+    }
+
+    .rewards {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 14px;
+      background: #1e1e1e;
+      border-radius: 10px;
+      padding: 5px 10px;
+    }
+
+    .tab-content {
+      display: none;
+      padding: 20px;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
     .card-container {
       display: flex;
       overflow-x: auto;
       gap: 20px;
-      padding: 10px 20px;
       scroll-snap-type: x mandatory;
     }
 
@@ -64,29 +92,18 @@
       display: block;
       width: 100%;
       padding: 10px;
-      background: #3b82f6;
-      color: white;
+      background: #00ffcc;
+      color: black;
       border: none;
       border-radius: 10px;
       font-size: 16px;
     }
 
-    .wallet-btn {
-      margin: 10px auto;
-      display: block;
-      background: #3b82f6;
-      color: white;
-      padding: 10px 20px;
-      font-size: 15px;
-      border: none;
-      border-radius: 10px;
-    }
-
     .section {
-      padding: 10px 20px;
-      background: rgba(0,0,0,0.5);
       margin: 10px 0;
+      background: rgba(0,0,0,0.5);
       border-radius: 16px;
+      padding: 10px;
     }
 
     .referral-box, .leaderboard-box {
@@ -96,6 +113,14 @@
       margin-top: 10px;
     }
 
+    .earnings-header {
+      font-size: 28px;
+      text-align: center;
+      font-weight: bold;
+      color: #00ffcc;
+      margin-bottom: 10px;
+    }
+
     footer {
       position: fixed;
       bottom: 0;
@@ -103,7 +128,7 @@
       background: rgba(0, 0, 0, 0.9);
       display: flex;
       justify-content: space-around;
-      padding: 8px 0;
+      padding: 10px 0;
     }
 
     footer button {
@@ -115,106 +140,93 @@
     footer img {
       width: 30px;
     }
-
-    .earnings-header {
-      font-size: 28px;
-      text-align: center;
-      font-weight: bold;
-      color: #00ffcc;
-      margin-bottom: 10px;
-    }
-
-    .wallet-info {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      font-size: 14px;
-      color: #aaa;
-    }
-
-    .rewards {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      font-size: 14px;
-      background: #1e1e1e;
-      border-radius: 10px;
-      padding: 5px 10px;
-    }
   </style>
 </head>
 <body>
   <header>🚀 StakeUP Rocket</header>
-  <div class="wallet-info">@username</div>
-  <div class="rewards">💰 24$</div>
+  <div class="wallet-info">@user</div>
+  <div class="rewards">💰 0$</div>
 
-  <div class="card-container">
-    <div class="card">
-      <img src="https://ton.org/download/ton_symbol.png" class="coin-icon"/>
-      <div class="stake-info">
-        <strong>TON Staking</strong><br/>
-        8% за 4 дня<br/>
-        <small>от 1 TON</small>
+  <div id="main" class="tab-content active">
+    <div class="card-container">
+      <div class="card">
+        <img src="https://ton.org/download/ton_symbol.png" class="coin-icon"/>
+        <div class="stake-info">
+          <strong>TON Staking</strong><br/> 8% за 4 дня<br/><small>от 1 TON</small>
+        </div>
+        <button class="stake-button" onclick="alert('Введите сумму для стейкинга TON')">Стейкать</button>
       </div>
-      <button class="stake-button">Стейкать</button>
-    </div>
-    <div class="card">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/2048px-Bitcoin.svg.png" class="coin-icon"/>
-      <div class="stake-info">
-        <strong>BTC Staking</strong><br/>
-        5% за 5 дней<br/>
-        <small>от 0.001 BTC</small>
+      <div class="card">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/2048px-Bitcoin.svg.png" class="coin-icon"/>
+        <div class="stake-info">
+          <strong>BTC Staking</strong><br/> 5% за 5 дней<br/><small>от 0.001 BTC</small>
+        </div>
+        <button class="stake-button" onclick="alert('Введите сумму для стейкинга BTC')">Стейкать</button>
       </div>
-      <button class="stake-button">Стейкать</button>
-    </div>
-    <div class="card">
-      <img src="https://images.seeklogo.com/logo-png/32/1/tether-usdt-logo-png_seeklogo-323175.png" class="coin-icon"/>
-      <div class="stake-info">
-        <strong>USDT Staking</strong><br/>
-        7% за 6 дней<br/>
-        <small>от 10 USDT</small>
+      <div class="card">
+        <img src="https://images.seeklogo.com/logo-png/32/1/tether-usdt-logo-png_seeklogo-323175.png" class="coin-icon"/>
+        <div class="stake-info">
+          <strong>USDT Staking</strong><br/> 7% за 6 дней<br/><small>от 10 USDT</small>
+        </div>
+        <button class="stake-button" onclick="alert('Введите сумму для стейкинга USDT')">Стейкать</button>
       </div>
-      <button class="stake-button">Стейкать</button>
-    </div>
-    <div class="card">
-      <img src="https://www.shutterstock.com/image-vector/notcoin-logo-inside-black-circle-260nw-2486263053.jpg" class="coin-icon"/>
-      <div class="stake-info">
-        <strong>Notcoin Staking</strong><br/>
-        10% за 3 дня<br/>
-        <small>от 1000 NOT</small>
+      <div class="card">
+        <img src="https://www.shutterstock.com/image-vector/notcoin-logo-inside-black-circle-260nw-2486263053.jpg" class="coin-icon"/>
+        <div class="stake-info">
+          <strong>Notcoin Staking</strong><br/> 10% за 3 дня<br/><small>от 1000 NOT</small>
+        </div>
+        <button class="stake-button" onclick="alert('Введите сумму для стейкинга NOT')">Стейкать</button>
       </div>
-      <button class="stake-button">Стейкать</button>
     </div>
   </div>
 
-  <button class="wallet-btn">🔗 Telegram Wallet подключён</button>
-
-  <div class="section">
-    <h3>🏆 ТОП Лидеры</h3>
-    <div class="leaderboard-box">@fox - TON: 100 → $8.00</div>
-    <div class="leaderboard-box">@lena - BTC: 0.01 → $12.00</div>
-    <div class="leaderboard-box">@maverick - USDT: 300 → $21.00</div>
-    <div class="leaderboard-box">@xan - NOT: 20000 → $10.00</div>
+  <div id="earn" class="tab-content">
+    <div class="section">
+      <div class="earnings-header">$0.00</div>
+      <div class="referral-box">TON → +$0.00</div>
+      <div class="referral-box">BTC → +$0.00</div>
+    </div>
   </div>
 
-  <div class="section">
-    <h3>🤝 Рефералы</h3>
-    <div class="referral-box">Вы пригласили: <strong>3</strong> друга</div>
-    <button class="stake-button">🔗 Поделиться ссылкой</button>
+  <div id="referrals" class="tab-content">
+    <div class="section">
+      <h3>🤝 Рефералы</h3>
+      <div class="referral-box">Вы пригласили: <strong>0</strong> друзей</div>
+      <button class="stake-button" onclick="alert('Ссылка скопирована или отправлена в Telegram')">🔗 Поделиться ссылкой</button>
+      <div class="referral-box">Нет рефералов для отображения</div>
+    </div>
   </div>
 
-  <div class="section">
-    <div class="earnings-header">$139.80</div>
-    <div class="referral-box">Стейк 20 TON → +$1.6</div>
-    <div class="referral-box">Стейк 0.002 BTC → +$3.1</div>
-    <div class="referral-box">Реферал @cool присоединился</div>
+  <div id="leaders" class="tab-content">
+    <div class="section">
+      <h3>🏆 ТОП Лидеры</h3>
+      <div class="leaderboard-box">@fox - TON: 100 → $8.00</div>
+      <div class="leaderboard-box">@lena - BTC: 0.01 → $12.00</div>
+      <div class="leaderboard-box">@maverick - USDT: 300 → $21.00</div>
+      <div class="leaderboard-box">@xan - NOT: 20000 → $10.00</div>
+    </div>
   </div>
 
   <footer>
-    <button title="Главная"><img src="https://images.icon-icons.com/1144/PNG/512/homepage_80953.png"/></button>
-    <button title="Заработок"><img src="https://cdn-icons-png.flaticon.com/512/3594/3594376.png"/></button>
-    <button title="Рефералы"><img src="https://cdn-icons-png.flaticon.com/512/1953/1953403.png"/></button>
-    <button title="Лидеры"><img src="https://cdn-icons-png.flaticon.com/512/2502/2502806.png"/></button>
+    <button onclick="switchTab('main')" title="Главная">
+      <img src="https://images.icon-icons.com/1144/PNG/512/homepage_80953.png"/>
+    </button>
+    <button onclick="switchTab('earn')" title="Заработок">
+      <img src="https://cdn-icons-png.flaticon.com/512/3594/3594376.png"/>
+    </button>
+    <button onclick="switchTab('referrals')" title="Рефералы">
+      <img src="https://cdn-icons-png.flaticon.com/512/1953/1953403.png"/>
+    </button>
+    <button onclick="switchTab('leaders')" title="Лидеры">
+      <img src="https://cdn-icons-png.flaticon.com/512/2502/2502806.png"/>
+    </button>
   </footer>
+
+  <script>
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+    }
+  </script>
 </body>
 </html>
