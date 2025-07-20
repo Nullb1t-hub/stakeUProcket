@@ -1,72 +1,140 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>StakeUP Rocket</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     body {
-      font-family: sans-serif;
-      background: #0f0f23;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: radial-gradient(circle at center, #0a0a23, #000000);
       color: white;
-      padding: 20px;
+      overflow-x: hidden;
     }
-    h1 {
+
+    header {
       text-align: center;
-      color: #00ffd5;
+      padding: 20px;
+      font-size: 24px;
+      font-weight: bold;
     }
-    select, input, button {
+
+    .card-container {
+      display: flex;
+      overflow-x: auto;
+      gap: 20px;
+      padding: 10px 20px;
+      scroll-snap-type: x mandatory;
+    }
+
+    .card {
+      flex: 0 0 250px;
+      background: #111827;
+      border-radius: 20px;
+      padding: 20px;
+      scroll-snap-align: start;
+      box-shadow: 0 0 15px rgba(255,255,255,0.1);
+    }
+
+    .coin-icon {
+      width: 40px;
+      height: 40px;
+    }
+
+    .stake-info {
+      margin: 15px 0;
+    }
+
+    .stake-button {
+      display: block;
       width: 100%;
       padding: 10px;
-      margin: 10px 0;
-      font-size: 16px;
-      border-radius: 10px;
+      background: #3b82f6;
+      color: white;
       border: none;
+      border-radius: 10px;
+      font-size: 16px;
     }
-    button {
-      background-color: #00ffd5;
-      color: #000;
-      cursor: pointer;
+
+    .wallet-btn {
+      margin: 20px auto;
+      display: block;
+      background: #10b981;
+      color: white;
+      padding: 12px 24px;
+      font-size: 16px;
+      border: none;
+      border-radius: 12px;
+    }
+
+    footer {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: #1f2937;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+    }
+
+    footer button {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
-  <h1>🚀 StakeUP Rocket</h1>
-  <label>Выберите монету:</label>
-  <select id="coin">
-    <option value="TON">TON</option>
-    <option value="USDT">USDT</option>
-    <option value="TRX">TRX</option>
-  </select>
+  <header>🚀 StakeUP Rocket</header>
 
-  <label>Срок стейкинга:</label>
-  <select id="duration">
-    <option value="7">7 дней</option>
-    <option value="30">30 дней</option>
-    <option value="90">90 дней</option>
-  </select>
+  <div class="card-container">
+    <div class="card">
+      <img src="https://cryptologos.cc/logos/toncoin-ton-logo.png" class="coin-icon"/>
+      <div class="stake-info">
+        <strong>TON Staking</strong><br/>
+        8% за 4 дня<br/>
+        <small>от 1 TON</small>
+      </div>
+      <button class="stake-button">Stake now</button>
+    </div>
+    <div class="card">
+      <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" class="coin-icon"/>
+      <div class="stake-info">
+        <strong>Bitcoin Staking</strong><br/>
+        5% за 5 дней<br/>
+        <small>от 0.001 BTC</small>
+      </div>
+      <button class="stake-button">Stake now</button>
+    </div>
+    <div class="card">
+      <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" class="coin-icon"/>
+      <div class="stake-info">
+        <strong>USDT Staking</strong><br/>
+        7% за 6 дней<br/>
+        <small>от 10 USDT</small>
+      </div>
+      <button class="stake-button">Stake now</button>
+    </div>
+    <div class="card">
+      <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/29396.png" class="coin-icon"/>
+      <div class="stake-info">
+        <strong>Notcoin</strong><br/>
+        10% за 3 дня<br/>
+        <small>от 1000 NOT</small>
+      </div>
+      <button class="stake-button">Stake now</button>
+    </div>
+  </div>
 
-  <label>Сумма:</label>
-  <input type="number" id="amount" placeholder="Введите сумму" />
+  <button class="wallet-btn">🔗 Подключить Telegram Wallet</button>
 
-  <button onclick="sendToTelegram()">Застейкать</button>
-
-  <script>
-    function sendToTelegram() {
-      const coin = document.getElementById("coin").value;
-      const duration = document.getElementById("duration").value;
-      const amount = document.getElementById("amount").value;
-
-      const data = {
-        coin,
-        duration,
-        amount
-      };
-
-      Telegram.WebApp.sendData(JSON.stringify(data));
-      Telegram.WebApp.close();
-    }
-  </script>
+  <footer>
+    <button>🏠 Главная</button>
+    <button>💸 Заработок</button>
+    <button>👥 Рефералы</button>
+    <button>🏆 Лидеры</button>
+  </footer>
 </body>
 </html>
