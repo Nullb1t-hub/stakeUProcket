@@ -1,29 +1,27 @@
-const connectButton = document.getElementById('connect-button');
-const balanceEl = document.getElementById('balance');
+import { TonConnectUI } from "@tonconnect/ui";
 
-let tonConnectUI;
+const tonConnectUI = new TonConnectUI({
+  manifestUrl: 'https://stakeuprocket.github.io/webapp/tonconnect-manifest.json',
+  buttonRootId: 'connect-button',
+});
 
-async function init() {
-  tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-    manifestUrl: 'https://your-site.com/tonconnect-manifest.json',
-    buttonRootId: 'connect-button'
-  });
+// Отображение баланса и адреса пользователя
+tonConnectUI.onStatusChange(async (wallet) => {
+  if (wallet) {
+    const address = wallet.account.address;
+    document.querySelector('.user-info').innerHTML = `
+      <div id="balance">💎 Адрес: ${shortenAddress(address)}</div>
+      <button id="disconnect-button">❌ Отключиться</button>
+    `;
 
-  const connectedWallet = await tonConnectUI.restoreConnection();
-  if (connectedWallet) {
-    const walletInfo = connectedWallet.account.address;
-    updateUser(walletInfo);
+    // Обработка отключения
+    document.getElementById('disconnect-button').onclick = () => tonConnectUI.disconnect();
+
+    // Получение баланса (если хочешь через TonAPI — напиши, подключим)
   }
-}
+});
 
-function updateUser(walletAddress) {
-  document.getElementById('connect-button').innerText = '✅ Подключено';
-  fetch(`https://tonapi.io/v1/address/${walletAddress}`)
-    .then(res => res.json())
-    .then(data => {
-      const balance = (data.balance / 1e9).toFixed(2);
-      balanceEl.innerText = `💎 Баланс: ${balance} TON`;
-    });
+// Сокращённый адрес
+function shortenAddress(address) {
+  return address.slice(0, 6) + '...' + address.slice(-4);
 }
-
-window.addEventListener('load', init);
