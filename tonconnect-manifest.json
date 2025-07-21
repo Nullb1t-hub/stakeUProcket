@@ -3,7 +3,7 @@
   "name": "StakeUP Rocket",
   "url": "https://nullb1t-hub.github.io/stakeUProcket/",
   "icon_url": "https://ton.org/download/ton_symbol.png",
-  "terms_of_use_url": "https://your-site.com/terms",
-  "privacy_policy_url": "https://your-site.com/privacy",
+  "terms_of_use_url": "https://nullb1t-hub.github.io/stakeUProcket/terms",
+  "privacy_policy_url": "https://nullb1t-hub.github.io/stakeUProcket/privacy",
   "bridge_url": "https://bridge.tonapi.io"
 }
