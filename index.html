@@ -1,44 +1,139 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>StakeUP Rocket</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect.min.js"></script>
+  <script src="https://unpkg.com/@tonconnect/ui@latest"></script>
   <script defer src="script.js"></script>
+  <style>
+    body {
+      background-image: url('https://i.pinimg.com/originals/e5/cf/80/e5cf80f395c946fb3aa70002a537ad2a.png');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-position: center;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    header, footer {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 10px;
+    }
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .nav-icon {
+      color: white;
+      text-decoration: none;
+      font-size: 24px;
+      padding: 10px;
+    }
+    .nav-icon.active {
+      border-top: 2px solid #00f;
+    }
+    .page {
+      display: none;
+    }
+    .page.active {
+      display: block;
+    }
+    #ton-connect {
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
     <header>
       <div class="logo">🚀 StakeUP Rocket</div>
       <div class="user-info">
+        <div id="wallet-address">🙍‍♂️ Не подключено</div>
         <div id="balance">💎 Баланс: 0 TON</div>
-        <button id="connect-button">🔗 Подключить TON Wallet</button>
+        <div id="ton-connect"></div>
       </div>
     </header>
 
     <main>
-      <section class="welcome">
+      <section id="home" class="page active">
         <h1>Добро пожаловать в StakeUP!</h1>
         <p>Зарабатывай на стейкинге TON прямо в Telegram</p>
+        <div class="actions">
+          <button class="action-btn" onclick="alert('Скоро будет доступно')">📈 Стейкать</button>
+          <button class="action-btn" onclick="alert('Скоро будет доступно')">📤 Вывести</button>
+          <button class="action-btn" onclick="alert('Скоро будет доступно')">🎁 Рефералы</button>
+        </div>
       </section>
-
-      <section class="actions">
-        <button class="action-btn" onclick="alert('Скоро будет доступно')">📈 Стейкать</button>
-        <button class="action-btn" onclick="alert('Скоро будет доступно')">📤 Вывести</button>
-        <button class="action-btn" onclick="alert('Скоро будет доступно')">🎁 Рефералы</button>
+      <section id="earn" class="page">
+        <h2>💰 Заработок</h2>
+        <p>Тут будет страница заработка</p>
+      </section>
+      <section id="referrals" class="page">
+        <h2>🎁 Рефералы</h2>
+        <p>Твоя реферальная ссылка и список приглашённых</p>
+      </section>
+      <section id="profile" class="page">
+        <h2>👤 Профиль</h2>
+        <p>Информация о пользователе</p>
       </section>
     </main>
 
     <footer>
       <nav>
-        <a href="#" class="nav-icon">🏠</a>
-        <a href="#" class="nav-icon">💰</a>
-        <a href="#" class="nav-icon">📊</a>
-        <a href="#" class="nav-icon">👤</a>
+        <a href="#" class="nav-icon active" data-page="home">🏠</a>
+        <a href="#" class="nav-icon" data-page="earn">💰</a>
+        <a href="#" class="nav-icon" data-page="referrals">📊</a>
+        <a href="#" class="nav-icon" data-page="profile">👤</a>
       </nav>
     </footer>
   </div>
+
+  <script>
+    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+      manifestUrl: 'https://ВАШ_ДОМЕН/tonconnect-manifest.json',
+      buttonRootId: 'ton-connect'
+    });
+
+    tonConnectUI.onStatusChange(async (wallet) => {
+      if (wallet) {
+        const address = wallet.account.address;
+        document.getElementById('wallet-address').textContent = '👛 ' + address.slice(0, 6) + '...' + address.slice(-4);
+
+        try {
+          const res = await fetch(`https://tonapi.io/v2/accounts/${address}`);
+          const data = await res.json();
+          const balance = (data.balance / 1e9).toFixed(2);
+          document.getElementById('balance').textContent = `💎 Баланс: ${balance} TON`;
+        } catch (e) {
+          console.error('Ошибка при получении баланса TON:', e);
+        }
+      }
+    });
+
+    // Навигация вкладок
+    const navLinks = document.querySelectorAll('.nav-icon');
+    const pages = document.querySelectorAll('.page');
+
+    navLinks.forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        const targetPage = link.getAttribute('data-page');
+
+        navLinks.forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+
+        pages.forEach(page => {
+          if (page.id === targetPage) {
+            page.classList.add('active');
+          } else {
+            page.classList.remove('active');
+          }
+        });
+      });
+    });
+  </script>
 </body>
 </html>
