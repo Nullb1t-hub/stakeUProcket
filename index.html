@@ -1,25 +1,78 @@
-import React from "react";
-import addUser33169182761457 from "./add-user-3316918-2761457.png";
-import filter33169362761491 from "./filter-3316936-2761491.png";
-import home33169452761500 from "./home-3316945-2761500.png";
-import icon173 from "./icon17-3.png";
-import image942 from "./image-942.png";
-import image from "./image.svg";
-import pngwinGCom1 from "./pngwin-g-com-1.png";
-import rectangle3 from "./rectangle-3.svg";
-import rectangle from "./rectangle.png";
-import star33169522761507 from "./star-3316952-2761507.png";
-import subtract from "./subtract.svg";
-import telegramDark from "./telegram-dark.png";
-import tonSymbol1 from "./ton-symbol-1.png";
+import React, { useState } from "react";
+import addUserIcon from "./add-user-3316918-2761457.png";
+import filterIcon from "./filter-3316936-2761491.png";
+import homeIcon from "./home-3316945-2761500.png";
+import starIcon from "./star-3316952-2761507.png";
+import tonSymbol from "./ton-symbol-1.png";
 import vector1 from "./vector-1.svg";
 import vector2 from "./vector-2.svg";
+import subtract from "./subtract.svg";
+import rectangle3 from "./rectangle-3.svg";
+import telegramDark from "./telegram-dark.png";
+import image942 from "./image-942.png";
+import icon17 from "./icon17-3.png";
+import pngwin from "./pngwin-g-com-1.png";
+import backgroundImage from "./rectangle.png";
+import backgroundField from "./star-field.svg";
 
 export const Screen = () => {
+  const [activeTab, setActiveTab] = useState("main");
+
+  const switchTab = (tab) => {
+    setActiveTab(tab);
+  };
+
   return (
-    <div className="bg-transparent flex flex-row justify-center w-full">
-      <div className="overflow-hidden bg-[url(/star-field.svg)] bg-[100%_100%] w-[1080px] h-[1920px] relative">
-        {/* Остальной код — см. редактор */}
+    <div className="bg-transparent flex flex-col items-center justify-center w-full">
+      <div className="relative w-[1080px] h-[1920px] overflow-hidden bg-[url('/star-field.svg')] bg-cover">
+        {/* Верхняя панель */}
+        <div className="flex justify-between items-center px-6 pt-6">
+          <img src={tonSymbol} alt="TON" className="w-16 h-16" />
+          <img src={telegramDark} alt="Telegram" className="w-10 h-10" />
+        </div>
+
+        {/* Основной контент */}
+        <div className="flex flex-col items-center justify-center h-[85%] text-white px-10">
+          {activeTab === "main" && (
+            <>
+              <h1 className="text-5xl font-bold mb-4">StakeUP Rocket</h1>
+              <p className="text-center text-lg mb-8">
+                Подключи свой кошелёк TON и начни зарабатывать прямо сейчас!
+              </p>
+              <button className="bg-white text-black px-6 py-3 rounded-2xl text-xl font-semibold shadow-lg">
+                Подключить кошелёк
+              </button>
+            </>
+          )}
+
+          {activeTab === "earn" && (
+            <h1 className="text-4xl font-bold">Заработок</h1>
+          )}
+
+          {activeTab === "referrals" && (
+            <h1 className="text-4xl font-bold">Рефералы</h1>
+          )}
+
+          {activeTab === "leaders" && (
+            <h1 className="text-4xl font-bold">Лидеры</h1>
+          )}
+        </div>
+
+        {/* Нижнее меню вкладок */}
+        <div className="absolute bottom-0 w-full bg-black bg-opacity-50 flex justify-around py-6 border-t border-gray-700">
+          <button onClick={() => switchTab("main")}>
+            <img src={homeIcon} alt="Главная" className="w-10 h-10" />
+          </button>
+          <button onClick={() => switchTab("earn")}>
+            <img src={vector1} alt="Заработок" className="w-10 h-10" />
+          </button>
+          <button onClick={() => switchTab("referrals")}>
+            <img src={addUserIcon} alt="Рефералы" className="w-10 h-10" />
+          </button>
+          <button onClick={() => switchTab("leaders")}>
+            <img src={starIcon} alt="Лидеры" className="w-10 h-10" />
+          </button>
+        </div>
       </div>
     </div>
   );
