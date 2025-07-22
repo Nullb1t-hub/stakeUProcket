@@ -1,139 +1,172 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>StakeUP Rocket</title>
-  <link rel="stylesheet" href="styles.css">
-  <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect.min.js"></script>
-  <script src="https://unpkg.com/@tonconnect/ui@latest"></script>
-  <script defer src="script.js"></script>
-  <style>
-    body {
-      background-image: url('https://i.pinimg.com/originals/e5/cf/80/e5cf80f395c946fb3aa70002a537ad2a.png');
-      background-size: cover;
-      background-repeat: no-repeat;
-      background-attachment: fixed;
-      background-position: center;
-      color: white;
-      font-family: Arial, sans-serif;
-    }
-    header, footer {
-      background: rgba(0, 0, 0, 0.6);
-      padding: 10px;
-    }
-    .container {
-      max-width: 500px;
-      margin: 0 auto;
-    }
-    .nav-icon {
-      color: white;
-      text-decoration: none;
-      font-size: 24px;
-      padding: 10px;
-    }
-    .nav-icon.active {
-      border-top: 2px solid #00f;
-    }
-    .page {
-      display: none;
-    }
-    .page.active {
-      display: block;
-    }
-    #ton-connect {
-      margin-top: 10px;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <header>
-      <div class="logo">🚀 StakeUP Rocket</div>
-      <div class="user-info">
-        <div id="wallet-address">🙍‍♂️ Не подключено</div>
-        <div id="balance">💎 Баланс: 0 TON</div>
-        <div id="ton-connect"></div>
-      </div>
-    </header>
+import React from "react";
+import addUser33169182761457 from "./add-user-3316918-2761457.png";
+import filter33169362761491 from "./filter-3316936-2761491.png";
+import home33169452761500 from "./home-3316945-2761500.png";
+import icon173 from "./icon17-3.png";
+import image942 from "./image-942.png";
+import image from "./image.svg";
+import pngwinGCom1 from "./pngwin-g-com-1.png";
+import rectangle3 from "./rectangle-3.svg";
+import rectangle from "./rectangle.png";
+import star33169522761507 from "./star-3316952-2761507.png";
+import subtract from "./subtract.svg";
+import telegramDark from "./telegram-dark.png";
+import tonSymbol1 from "./ton-symbol-1.png";
+import vector1 from "./vector-1.svg";
+import vector2 from "./vector-2.svg";
 
-    <main>
-      <section id="home" class="page active">
-        <h1>Добро пожаловать в StakeUP!</h1>
-        <p>Зарабатывай на стейкинге TON прямо в Telegram</p>
-        <div class="actions">
-          <button class="action-btn" onclick="alert('Скоро будет доступно')">📈 Стейкать</button>
-          <button class="action-btn" onclick="alert('Скоро будет доступно')">📤 Вывести</button>
-          <button class="action-btn" onclick="alert('Скоро будет доступно')">🎁 Рефералы</button>
+export const Screen = () => {
+  return (
+    <div className="bg-transparent flex flex-row justify-center w-full">
+      <div className="overflow-hidden bg-[url(/star-field.svg)] bg-[100%_100%] w-[1080px] h-[1920px] relative">
+        <div className="absolute w-[1090px] h-[1979px] top-[357px] left-[-3px]">
+          <img
+            className="absolute w-[1080px] h-[1073px] top-[490px] left-[3px] object-cover"
+            alt="Pngwing com"
+            src={pngwinGCom1}
+          />
+
+          <img
+            className="absolute w-[1080px] h-[1378px] top-[185px] left-[3px] object-cover"
+            alt="Icon"
+            src={icon173}
+          />
+
+          <div className="inline-flex items-center justify-end gap-2.5 p-2.5 absolute top-[1138px] left-[910px]">
+            <img
+              className="relative w-[126px] h-[129px] object-cover"
+              alt="Telegram dark"
+              src={telegramDark}
+            />
+          </div>
+
+          <div className="absolute w-[1090px] h-[633px] top-[1346px] left-0">
+            <div className="absolute w-[1080px] h-[217px] top-0 left-[3px] bg-[url(/rectangle-2.svg)] bg-[100%_100%]">
+              <img
+                className="absolute w-[1080px] h-[165px] top-[52px] left-0"
+                alt="Rectangle"
+                src={rectangle3}
+              />
+
+              <img
+                className="absolute w-[110px] h-[110px] top-[85px] left-[85px] object-cover"
+                alt="Home"
+                src={home33169452761500}
+              />
+
+              <img
+                className="absolute w-[110px] h-[110px] top-[90px] left-[361px] object-cover"
+                alt="Filter"
+                src={filter33169362761491}
+              />
+
+              <img
+                className="absolute w-[110px] h-[110px] top-[78px] left-[617px] object-cover"
+                alt="Add user"
+                src={addUser33169182761457}
+              />
+
+              <img
+                className="absolute w-[110px] h-[110px] top-[78px] left-[886px] object-cover"
+                alt="Star"
+                src={star33169522761507}
+              />
+
+              <img
+                className="absolute w-[361px] h-[191px] top-[26px] left-0"
+                alt="Vector"
+                src={vector2}
+              />
+            </div>
+
+            <img
+              className="absolute w-[1075px] h-px top-[954px] left-[140px]"
+              alt="Vector"
+              src={vector1}
+            />
+          </div>
+
+          <img
+            className="w-[544px] top-0 left-[17px] absolute h-[357px]"
+            alt="Subtract"
+            src={subtract}
+          />
+
+          <img
+            className="w-[535px] top-px left-[548px] absolute h-[357px]"
+            alt="Subtract"
+            src={image}
+          />
+
+          <img
+            className="absolute w-[62px] h-[62px] top-[45px] left-[70px] object-cover"
+            alt="Ton symbol"
+            src={tonSymbol1}
+          />
+
+          <div className="absolute h-[47px] top-[53px] left-[161px] [text-shadow:0px_0px_3.15px_#0009ff11] bg-[linear-gradient(90deg,rgba(0,152,234,1)_0%,rgba(0,86,132,1)_100%)] [-webkit-background-clip:text] bg-clip-text [-webkit-text-fill-color:transparent] [text-fill-color:transparent] [font-family:'Roboto-Regular',Helvetica] font-normal text-transparent text-[40px] text-center tracking-[0] leading-[normal] whitespace-nowrap">
+            Toncoin (TON)
+          </div>
+
+          <img
+            className="absolute w-[162px] h-[81px] top-[31px] left-[554px] object-cover"
+            alt="Rectangle"
+            src={rectangle}
+          />
+
+          <div className="absolute h-[47px] top-[50px] left-[706px] [text-shadow:0px_0px_3.15px_#00ff8509] bg-[linear-gradient(90deg,rgba(37,162,122,1)_0%,rgba(14,60,45,1)_100%)] [-webkit-background-clip:text] bg-clip-text [-webkit-text-fill-color:transparent] [text-fill-color:transparent] [font-family:'Roboto-Regular',Helvetica] font-normal text-transparent text-[40px] text-center tracking-[0] leading-[normal] whitespace-nowrap">
+            Tether (USDT)
+          </div>
+
+          <div className="absolute w-[198px] h-[49px] top-[225px] left-[190px] rounded-[100px] shadow-[0px_0px_3.15px_#0010f415,0px_0px_6.52px_#0010f423,0px_0px_13px_#0010f42d,0px_0px_25.48px_#0010f436,0px_0px_46.85px_#0010f444,0px_0px_80px_#0010f459] bg-[linear-gradient(90deg,rgba(73,49,253,1)_0%,rgba(44,29,151,1)_100%)]" />
+
+          <div className="absolute w-[198px] h-[49px] top-[227px] left-[711px] rounded-[100px] shadow-[0px_0px_3.15px_#00e86a14,0px_0px_6.52px_#00e86a21,0px_0px_13px_#00e86a2a,0px_0px_25.48px_#00e86a33,0px_0px_46.85px_#00e86a40,0px_0px_80px_#00e86a54] bg-[linear-gradient(90deg,rgba(37,199,121,1)_0%,rgba(18,97,59,1)_100%)]" />
+
+          <div className="absolute h-3 top-[279px] left-[114px] [font-family:'Roboto-Regular',Helvetica] font-normal text-white text-[10px] text-center tracking-[0] leading-[normal] whitespace-nowrap">
+            min 1 TON
+          </div>
+
+          <div className="absolute h-3 top-[282px] left-[646px] [font-family:'Roboto-Regular',Helvetica] font-normal text-white text-[10px] text-center tracking-[0] leading-[normal] whitespace-nowrap">
+            min 5 USDT
+          </div>
+
+          <div className="top-[277px] left-[394px] absolute h-3 [font-family:'Roboto-Regular',Helvetica] font-normal text-white text-[10px] text-center tracking-[0] leading-[normal] whitespace-nowrap">
+            max 9999 TON
+          </div>
+
+          <div className="top-[281px] left-[904px] absolute h-3 [font-family:'Roboto-Regular',Helvetica] font-normal text-white text-[10px] text-center tracking-[0] leading-[normal] whitespace-nowrap">
+            max 1000001 USDT
+          </div>
+
+          <div className="top-[228px] left-[248px] absolute h-[38px] [text-shadow:3.08px_-1.44px_12px_#00000026] [-webkit-text-stroke:1px_transparent] bg-[conic-gradient(from_90deg_at_100%_100%,rgba(255,255,255,0)_18%,rgba(255,255,255,0.4)_43%,rgba(255,255,255,0)_68%,rgba(255,255,255,0.4)_93%)_1] [-webkit-background-clip:text] [font-family:'Roboto-Regular',Helvetica] font-normal text-[#ffffff1a] text-[32px] text-center tracking-[0] leading-[normal] whitespace-nowrap">
+            Stake
+          </div>
+
+          <div className="top-[231px] left-[776px] absolute h-[38px] [text-shadow:3.08px_-1.44px_12px_#00000026] [-webkit-text-stroke:1px_transparent] bg-[conic-gradient(from_90deg_at_100%_100%,rgba(255,255,255,0)_18%,rgba(255,255,255,0.4)_43%,rgba(255,255,255,0)_68%,rgba(255,255,255,0.4)_93%)_1] [-webkit-background-clip:text] [font-family:'Roboto-Regular',Helvetica] font-normal text-[#ffffff1a] text-[32px] text-center tracking-[0] leading-[normal] whitespace-nowrap">
+            Stake
+          </div>
+
+          <div className="top-[127px] left-[157px] absolute w-[262px] h-[38px] bg-[#ffffff11] rounded-[10px] border-[none] shadow-[inset_1.34px_1.02px_4.62px_#ffffff20,inset_2.37px_1.79px_9.24px_#ffffff20,-2.05px_-1.55px_12px_-8px_#00000026,-12.3px_-9.3px_48px_-12px_#00000026] backdrop-blur-[7.58px] backdrop-brightness-[100%] [-webkit-backdrop-filter:blur(7.58px)_brightness(100%)] before:content-[''] before:absolute before:inset-0 before:p-px before:rounded-[10px] before:[background:conic-gradient(from_90deg_at_100%_100%,rgba(255,255,255,0.35)_10%,rgba(255,255,255,0)_35%,rgba(255,255,255,0.35)_60%,rgba(255,255,255,0)_85%)] before:[-webkit-mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] before:[-webkit-mask-composite:xor] before:[mask-composite:exclude] before:z-[1] before:pointer-events-none" />
+
+          <div className="top-32 left-[674px] absolute w-[262px] h-[38px] bg-[#ffffff11] rounded-[10px] border-[none] shadow-[inset_1.34px_1.02px_4.62px_#ffffff20,inset_2.37px_1.79px_9.24px_#ffffff20,-2.05px_-1.55px_12px_-8px_#00000026,-12.3px_-9.3px_48px_-12px_#00000026] backdrop-blur-[7.58px] backdrop-brightness-[100%] [-webkit-backdrop-filter:blur(7.58px)_brightness(100%)] before:content-[''] before:absolute before:inset-0 before:p-px before:rounded-[10px] before:[background:conic-gradient(from_90deg_at_100%_100%,rgba(255,255,255,0.35)_10%,rgba(255,255,255,0)_35%,rgba(255,255,255,0.35)_60%,rgba(255,255,255,0)_85%)] before:[-webkit-mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] before:[-webkit-mask-composite:xor] before:[mask-composite:exclude] before:z-[1] before:pointer-events-none" />
         </div>
-      </section>
-      <section id="earn" class="page">
-        <h2>💰 Заработок</h2>
-        <p>Тут будет страница заработка</p>
-      </section>
-      <section id="referrals" class="page">
-        <h2>🎁 Рефералы</h2>
-        <p>Твоя реферальная ссылка и список приглашённых</p>
-      </section>
-      <section id="profile" class="page">
-        <h2>👤 Профиль</h2>
-        <p>Информация о пользователе</p>
-      </section>
-    </main>
 
-    <footer>
-      <nav>
-        <a href="#" class="nav-icon active" data-page="home">🏠</a>
-        <a href="#" class="nav-icon" data-page="earn">💰</a>
-        <a href="#" class="nav-icon" data-page="referrals">📊</a>
-        <a href="#" class="nav-icon" data-page="profile">👤</a>
-      </nav>
-    </footer>
-  </div>
+        <div className="absolute w-[280px] h-[57px] top-11 left-[761px] bg-[#2645d0] rounded-[50px]">
+          <div className="absolute w-[229px] h-[54px] top-0.5 left-[49px] [font-family:'Koulen-Regular',Helvetica] font-normal text-white text-3xl text-center tracking-[0] leading-[normal]">
+            connect WALLET
+          </div>
 
-  <script>
-    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-      manifestUrl: 'https://ВАШ_ДОМЕН/tonconnect-manifest.json',
-      buttonRootId: 'ton-connect'
-    });
+          <img
+            className="absolute w-[35px] h-[35px] top-[11px] left-[33px] object-cover"
+            alt="Image"
+            src={image942}
+          />
+        </div>
 
-    tonConnectUI.onStatusChange(async (wallet) => {
-      if (wallet) {
-        const address = wallet.account.address;
-        document.getElementById('wallet-address').textContent = '👛 ' + address.slice(0, 6) + '...' + address.slice(-4);
-
-        try {
-          const res = await fetch(`https://tonapi.io/v2/accounts/${address}`);
-          const data = await res.json();
-          const balance = (data.balance / 1e9).toFixed(2);
-          document.getElementById('balance').textContent = `💎 Баланс: ${balance} TON`;
-        } catch (e) {
-          console.error('Ошибка при получении баланса TON:', e);
-        }
-      }
-    });
-
-    // Навигация вкладок
-    const navLinks = document.querySelectorAll('.nav-icon');
-    const pages = document.querySelectorAll('.page');
-
-    navLinks.forEach(link => {
-      link.addEventListener('click', e => {
-        e.preventDefault();
-        const targetPage = link.getAttribute('data-page');
-
-        navLinks.forEach(l => l.classList.remove('active'));
-        link.classList.add('active');
-
-        pages.forEach(page => {
-          if (page.id === targetPage) {
-            page.classList.add('active');
-          } else {
-            page.classList.remove('active');
-          }
-        });
-      });
-    });
-  </script>
-</body>
-</html>
+        <div className="absolute h-[54px] top-[42px] left-[29px] [font-family:'Koulen-Regular',Helvetica] font-normal text-white text-3xl text-center tracking-[0] leading-[normal]">
+          balance:
+        </div>
+      </div>
+    </div>
+  );
+};
