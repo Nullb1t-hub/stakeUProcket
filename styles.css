@@ -1,60 +1,8 @@
-body {
-  margin: 0;
-  font-family: 'Arial', sans-serif;
-  background: url('https://i.7fon.org/1000/w661517917.jpg') no-repeat center center fixed;
-  background-size: cover;
-  color: white;
-}
+@tailwind components;
+@tailwind utilities;
 
-.container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
-
-header {
-  display: flex;
-  justify-content: space-between;
-  padding: 1rem;
-  background: rgba(0, 0, 0, 0.7);
-}
-
-.user-info {
-  display: flex;
-  gap: 10px;
-}
-
-main {
-  flex: 1;
-  padding: 1rem;
-  overflow-y: auto;
-  background-color: rgba(0,0,0,0.4);
-}
-
-footer nav {
-  display: flex;
-  justify-content: space-around;
-  padding: 1rem;
-  background: rgba(0,0,0,0.8);
-  position: fixed;
-  width: 100%;
-  bottom: 0;
-}
-
-.nav-icon {
-  font-size: 24px;
-  color: white;
-  text-decoration: none;
-}
-
-.action-btn {
-  display: block;
-  width: 100%;
-  margin-bottom: 1rem;
-  padding: 1rem;
-  background: #00aaff;
-  color: white;
-  font-size: 18px;
-  border: none;
-  border-radius: 10px;
+@layer components {
+  .all-\[unset\] {
+    all: unset;
+  }
 }
