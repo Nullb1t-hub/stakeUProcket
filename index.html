@@ -1,112 +1,19 @@
-import React, { useState } from "react";
-import './App.css';
-
-export const Screen = () => {
-  const [activeTab, setActiveTab] = useState("home");
-
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case "home":
-        return (
-          <div className="pt-8 px-4">
-            <div className="flex justify-between items-center mb-4 text-white">
-              <span>Balance:</span>
-              <button className="bg-blue-600 text-white rounded-full px-4 py-1 text-sm">Connect Wallet</button>
-            </div>
-
-            <div className="flex justify-around mb-8">
-              <div className="bg-black/70 p-4 rounded-xl w-[45%] text-center text-white">
-                <div className="mb-2 text-cyan-400 font-bold">Toncoin (TON)</div>
-                <input className="w-full h-8 rounded bg-black/40 text-center text-white mb-2" placeholder="amount" />
-                <button className="bg-blue-600 w-full rounded py-1">Stake</button>
-              </div>
-              <div className="bg-black/70 p-4 rounded-xl w-[45%] text-center text-white">
-                <div className="mb-2 text-green-400 font-bold">Tether (USDT)</div>
-                <input className="w-full h-8 rounded bg-black/40 text-center text-white mb-2" placeholder="amount" />
-                <button className="bg-green-500 w-full rounded py-1">Stake</button>
-              </div>
-            </div>
-
-            <div className="flex justify-center">
-              <img src="/rocket.png" alt="rocket" className="w-1/2" />
-            </div>
-          </div>
-        );
-      case "earn":
-        return (
-          <div className="pt-8 px-4 text-white">
-            <h2 className="text-xl font-bold mb-4 text-center">🤑 Заработок</h2>
-            <div className="bg-black/70 p-4 rounded-xl mb-4">
-              <p className="mb-2">💎 Стейкай TON или USDT и получай доход каждый день!</p>
-              <button className="bg-purple-600 w-full rounded py-2 mt-2">Начать зарабатывать</button>
-            </div>
-            <div className="bg-black/70 p-4 rounded-xl">
-              <p>📈 Текущая доходность: <span className="text-green-400">8% годовых</span></p>
-            </div>
-          </div>
-        );
-      case "referrals":
-        return (
-          <div className="pt-8 px-4 text-white">
-            <h2 className="text-xl font-bold mb-4 text-center">👥 Рефералы</h2>
-            <div className="bg-black/70 p-4 rounded-xl mb-4">
-              <p className="mb-2">💰 Приглашай друзей и получай бонусы!</p>
-              <input
-                className="w-full h-10 rounded bg-black/40 text-center text-white mb-2"
-                value="https://t.me/StakeBot?start=ref123"
-                readOnly
-              />
-              <button className="bg-blue-600 w-full rounded py-2">Скопировать ссылку</button>
-            </div>
-            <div className="bg-black/70 p-4 rounded-xl">
-              <p>👤 Приглашено друзей: <span className="text-blue-400">5</span></p>
-              <p>💸 Заработано с рефералов: <span className="text-green-400">120 USDT</span></p>
-            </div>
-          </div>
-        );
-      case "leaders":
-        return (
-          <div className="pt-8 px-4 text-white">
-            <h2 className="text-xl font-bold mb-4 text-center">⭐ Лидеры</h2>
-            <div className="bg-black/70 p-4 rounded-xl space-y-2">
-              <div className="flex justify-between border-b border-white/10 pb-1">
-                <span>🥇 @crypto_king</span>
-                <span className="text-green-400">1500 USDT</span>
-              </div>
-              <div className="flex justify-between border-b border-white/10 pb-1">
-                <span>🥈 @tonmaster</span>
-                <span className="text-green-400">1100 USDT</span>
-              </div>
-              <div className="flex justify-between">
-                <span>🥉 @rocketman</span>
-                <span className="text-green-400">950 USDT</span>
-              </div>
-            </div>
-          </div>
-        );
-      default:
-        return null;
-    }
-  };
-
-  return (
-    <div className="bg-black min-h-screen text-white relative">
-      <div className="absolute inset-0 bg-[url('/star-field.svg')] bg-cover bg-center z-0" />
-
-      <div className="relative z-10">
-        {renderTabContent()}
-      </div>
-
-      <div className="fixed bottom-0 left-0 right-0 bg-[#1e1e1e] flex justify-around py-2 z-20 rounded-t-2xl border-t border-gray-700">
-        <button onClick={() => setActiveTab("home")}
-          className={`flex flex-col items-center ${activeTab === "home" ? 'text-blue-400' : 'text-white'}`}>🏠</button>
-        <button onClick={() => setActiveTab("earn")}
-          className={`flex flex-col items-center ${activeTab === "earn" ? 'text-blue-400' : 'text-white'}`}>📊</button>
-        <button onClick={() => setActiveTab("referrals")}
-          className={`flex flex-col items-center ${activeTab === "referrals" ? 'text-blue-400' : 'text-white'}`}>👥</button>
-        <button onClick={() => setActiveTab("leaders")}
-          className={`flex flex-col items-center ${activeTab === "leaders" ? 'text-blue-400' : 'text-white'}`}>⭐</button>
-      </div>
-    </div>
-  );
-};
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Anima Project - Automatically generated by Anima</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <style>
+      @import url("https://fonts.googleapis.com/css?family=Roboto:400|Koulen:400");
+    </style>
+    <link href="tailwind.css" rel="stylesheet" />
+    <link href="tailwind.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="./src/index.tsx"></script>
+  </body>
+</html>
