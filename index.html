@@ -62,7 +62,8 @@
   (function(){
     const React = window.React;
     const ReactDOM = window.ReactDOM;
-    const { useState, useEffect, useRef } = React;
+    // Added useMemo to the destructuring to fix the ReferenceError
+    const { useState, useEffect, useRef, useMemo } = React;
 
     /*************************************************************************
      * Enhanced StakeUP Rocket — Single-file demo (UMD React)
@@ -258,7 +259,7 @@
       // referral link & QR
       const refLink = `${window.location.origin}${window.location.pathname}?ref=${user.id}`;
       useEffect(()=>{
-        const q = document.getElementById('refQR'); if (q) { QRCode.toCanvas(q, refLink, { width: 120 }); }
+        const q = document.getElementById('refQR'); if (q && window.QRCode) { try { QRCode.toCanvas(q, refLink, { width: 120 }); } catch(e){ console.warn('QR error', e); } }
       }, [user.id]);
 
       // reserve pool (10% locked for 100 days) — simple demo calculation
@@ -274,7 +275,8 @@
       },[]);
 
       // export sample CSV
-      function handleExport(){ if (stakes.length===0) { notify('Нет данных для экспорта'); return; } exportCSV(stakes.map(s=>({ id:s.id, token:s.tokenId, amount:s.amount, days:s.days, status:s.status, est:s.est, from:s.from, finish:new Date(s.finish).toISOString() }))); }
+      function handleExport(){ if (stakes.length===0) { notify('Нет данных для экспорта'); return; } exportCSV(stakes.map(s=>({ id:s.id, token:s.tokenId, amount:s.amount, days:s.days, status:s.status, est:s.est, from:s.from, finish:new Date(s.finish).toISOString() })));
+      }
 
       // Leaderboard (top SURc holders simulated) — simple UX marketing feature
       const leaderboard = useMemo(()=>{
