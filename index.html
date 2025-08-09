@@ -5,279 +5,478 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>StakeUP Rocket — SURc Staking</title>
 
-  <!-- Tailwind Play CDN (прототип) -->
+  <!-- Tailwind (Play CDN) for prototype / single-file demo -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Chart.js для графика -->
+  <!-- Framer Motion + React + ReactDOM via ESM -->
+  <script type="module">
+    // We'll import React etc. inside main script to avoid blocking here
+  </script>
+
+  <!-- Chart.js for charts -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
-    html,body,#root { height: 100%; }
-    body { background: linear-gradient(180deg,#030416 0%, #07102a 50%, #041226 100%); -webkit-font-smoothing:antialiased; }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace; }
-    .glass { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); backdrop-filter: blur(6px); }
+    html, body, #root { height: 100%; }
+    body {
+      background: linear-gradient(180deg, #020417 0%, #07122b 50%, #041226 100%);
+      color: #ffffff;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .glass {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      backdrop-filter: blur(6px);
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace;
+    }
+
+    /* small helper for animations */
+    .fade-in { animation: appear .45s ease both; }
+    @keyframes appear { from { opacity: 0; transform: translateY(6px) } to { opacity: 1; transform: translateY(0) } }
+
+    /* custom scrollbar for demo */
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 10px; }
+    ::-webkit-scrollbar-track { background: transparent; }
   </style>
 </head>
-<body class="text-white antialiased">
+<body>
   <div id="root" class="min-h-screen p-6"></div>
 
   <script type="module">
-    import React, { useEffect, useMemo, useState } from 'https://esm.sh/react@18.2.0';
-    import ReactDOM from 'https://esm.sh/react-dom@18.2.0/client';
-    import { motion } from 'https://esm.sh/framer-motion@10.12.16';
-    import { TonConnect } from 'https://esm.sh/@tonconnect/sdk@1.7.0';
+  import React, { useEffect, useMemo, useRef, useState } from 'https://esm.sh/react@18.2.0';
+  import ReactDOM from 'https://esm.sh/react-dom@18.2.0/client';
+  import { motion } from 'https://esm.sh/framer-motion@10.12.16';
+  import { TonConnect } from 'https://esm.sh/@tonconnect/sdk@1.7.0';
 
-    const MANUAL_WALLET = "UQCAZPmfXSp7qnmwNAECen7phkySJZqvZT3qj6WtEAx30oRe";
-    const TELEGRAM_CHANNEL = "https://t.me/+z0kf4aAqT4pjYTJi";
+  /*************************************************************************
+   * StakeUP Rocket — Single-file demo
+   *
+   * Notes:
+   * - This is a client-side demo. For production:
+   *    * add server-side tx verification before finalizing stakes,
+   *    * move user balances to secure DB,
+   *    * protect all endpoints and validate referral codes server-side.
+   * - To use TonConnect properly, create `manifest.json` on the same origin and include it in TonConnect init.
+   **************************************************************************/
 
-    const TOKENS = [
-      { id: "ton", name: "Toncoin", symbol: "TON", min: 0.01 },
-      { id: "usdt", name: "USDT (on TON)", symbol: "USDT", min: 1 },
-      { id: "surc", name: "SURc (StakeUP)", symbol: "SURc", min: 0 }
-    ];
+  const MANUAL_WALLET = "UQCAZPmfXSp7qnmwNAECen7phkySJZqvZT3qj6WtEAx30oRe";
+  const TELEGRAM_CHANNEL = "https://t.me/+z0kf4aAqT4pjYTJi";
 
-    const DURATIONS = [
-      { days: 4, label: "4d", apyRange: "8% - 10%" },
-      { days: 10, label: "10d", apyRange: "10% - 14%" },
-      { days: 30, label: "30d", apyRange: "14% - 18%" },
-    ];
+  const TOKENS = [
+    { id: "ton", name: "Toncoin", symbol: "TON", min: 0.01 },
+    { id: "usdt", name: "USDT (on TON)", symbol: "USDT", min: 1 },
+    { id: "surc", name: "SURc (StakeUP)", symbol: "SURc", min: 0 }
+  ];
 
-    const LS = {
-      USER: 'stakeup_user_v2',
-      BAL: 'stakeup_balance_v2',
-      STAKES: 'stakeup_stakes_v2',
-      ADDR: 'stakeup_addr_v2'
-    };
+  const DURATIONS = [
+    { days: 4, label: "4 дня", apyRange: "8% - 10%" },
+    { days: 10, label: "10 дней", apyRange: "10% - 14%" },
+    { days: 30, label: "30 дней", apyRange: "14% - 18%" },
+  ];
 
-    function read(key, fallback) {
-      try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; }
+  const LS = {
+    USER: 'stakeup_user_v_final',
+    BAL: 'stakeup_bal_v_final',
+    STAKES: 'stakeup_stakes_v_final',
+    ADDR: 'stakeup_addr_v_final'
+  };
+
+  function read(key, fallback) {
+    try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; }
+  }
+  function write(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
+  }
+  function uid() { return Math.random().toString(36).slice(2,10); }
+  function short(addr) { if (!addr) return '-'; return addr.slice(0,6) + '...' + addr.slice(-5); }
+  function round(n) { return Math.round((n||0) * 1000000) / 1000000; }
+
+  function estimateRewards(amount, apyRange, days) {
+    try {
+      const parts = apyRange.replace(/%/g,'').split('-').map(p => parseFloat(p));
+      const apy = (parts[0] + parts[1]) / 2;
+      const daily = apy / 100 / 365;
+      const r = amount * daily * days;
+      return Number(r.toFixed(6));
+    } catch { return 0; }
+  }
+
+  /***********************
+   * Main App component
+   ***********************/
+  function App() {
+    // TonConnect
+    const [ton, setTon] = useState(null);
+    const [connected, setConnected] = useState(!!read(LS.ADDR, null));
+    const [addr, setAddr] = useState(read(LS.ADDR, null));
+
+    // UI & flow
+    const [page, setPage] = useState('home'); // home, stake, wallet, history, stats
+    const [token, setToken] = useState(TOKENS[0]);
+    const [amount, setAmount] = useState(5);
+    const [duration, setDuration] = useState(DURATIONS[1]);
+    const [agree, setAgree] = useState(true);
+    const [stage, setStage] = useState('ready'); // ready | paying | manual | staked
+
+    // data
+    const [user, setUser] = useState(read(LS.USER, { id: uid(), referer: null, subs: false }));
+    const [balance, setBalance] = useState(read(LS.BAL, { SURc: 0, fromStakes: 0, fromRef: 0, fromSub: 0 }));
+    const [stakes, setStakes] = useState(read(LS.STAKES, [])); // active + history
+
+    // UI helpers
+    const [notif, setNotif] = useState(null);
+    const chartRef = useRef(null);
+
+    useEffect(()=> write(LS.USER, user), [user]);
+    useEffect(()=> write(LS.BAL, balance), [balance]);
+    useEffect(()=> write(LS.STAKES, stakes), [stakes]);
+    useEffect(()=> write(LS.ADDR, addr), [addr]);
+
+    useEffect(() => {
+      // animate header or expand webapp if in Telegram (best-effort)
+      try { window.Telegram?.WebApp?.expand?.(); } catch {}
+    }, []);
+
+    function notify(text, ms=3500) {
+      setNotif(text);
+      setTimeout(()=> setNotif(null), ms);
     }
-    function write(key, v) { try { localStorage.setItem(key, JSON.stringify(v)); } catch {} }
-    function uid() { return Math.random().toString(36).slice(2,10); }
-    function short(a) { if (!a) return '-'; return a.slice(0,6) + '...' + a.slice(-5); }
-    function round(n){ return Math.round((n||0)*1000000)/1000000; }
 
-    function estimateRewards(amount, apyRange, days) {
+    async function initTonConnect() {
       try {
-        const parts = apyRange.replace(/%/g,'').split('-').map(p => parseFloat(p));
-        const apy = (parts[0] + parts[1]) / 2;
-        const daily = apy / 100 / 365;
-        const r = amount * daily * days;
-        return Number(r.toFixed(6));
-      } catch { return 0; }
+        const t = new TonConnect({ manifestUrl: window.location.origin + '/manifest.json' });
+        setTon(t);
+        t.onAccountChanged?.((account) => {
+          if (account?.address) { setAddr(account.address); setConnected(true); notify('Кошелёк: ' + short(account.address)); }
+          else { setAddr(null); setConnected(false); }
+        });
+        return t;
+      } catch (e) {
+        console.warn('TonConnect init error', e);
+        notify('TonConnect недоступен в этом окружении');
+        return null;
+      }
     }
 
-    function App(){
-      const [tc, setTc] = useState(null);
-      const [connected, setConnected] = useState(!!read(LS.ADDR, null));
-      const [addr, setAddr] = useState(read(LS.ADDR, null));
+    async function connectWallet() {
+      try {
+        const t = ton || await initTonConnect();
+        if (!t) { notify('TonConnect недоступен'); return; }
+        await t.connect(); // opens wallet modal on supported wallets
+        const a = t.account?.address || null;
+        if (a) { setAddr(a); setConnected(true); notify('Подключено: ' + short(a)); }
+        else { setConnected(true); notify('Запрос на подключение отправлен (проверьте кошелёк)'); }
+      } catch (e) {
+        console.error(e);
+        notify('Ошибка подключения: ' + (e?.message || e));
+      }
+    }
 
-      const [token, setToken] = useState(TOKENS[0]);
-      const [amount, setAmount] = useState(10);
-      const [duration, setDuration] = useState(DURATIONS[1]);
-      const [agree, setAgree] = useState(true);
-      const [stage, setStage] = useState('ready'); // ready, paying, manual, staked
+    function disconnectWallet() {
+      try { ton?.disconnect?.(); } catch {}
+      setAddr(null); setConnected(false); setTon(null);
+      notify('Отключено');
+    }
 
-      const [user, setUser] = useState(read(LS.USER, { id: uid(), referer: null, subs: false }));
-      const [balance, setBalance] = useState(read(LS.BAL, { SURc: 0, fromStakes:0, fromRef:0, fromSub:0 }));
-      const [stakes, setStakes] = useState(read(LS.STAKES, []));
+    // send via TonConnect
+    async function sendTon(amountDecimal) {
+      if (!ton) { notify('Инициализируем TonConnect...'); await initTonConnect(); }
+      if (!ton) { notify('TonConnect недоступен'); return { ok:false }; }
+      try {
+        const messages = [{ address: MANUAL_WALLET, amount: amountDecimal.toString() }];
+        const r = await ton.sendTransaction({ messages });
+        return { ok:true, res:r };
+      } catch (e) {
+        console.error('send error', e);
+        return { ok:false, e };
+      }
+    }
 
-      const [notif, setNotif] = useState(null);
+    function createStakeRecord({ tokenId, amount, days, from }) {
+      const id = uid();
+      const started = Date.now();
+      const finish = started + days * 24*3600*1000;
+      const apy = duration.apyRange;
+      const est = estimateRewards(amount, apy, days);
+      const stake = { id, tokenId, amount, days, apy, est, started, finish, from, status: 'active' };
+      setStakes(prev => [stake, ...prev].slice(0, 500));
+      // credit SURc: 10x for external tokens
+      const bonus = tokenId !== 'surc' ? (amount * 10) : 0;
+      setBalance(prev => ({ ...prev, SURc: round((prev.SURc||0) + bonus), fromStakes: round((prev.fromStakes||0) + bonus) }));
+      notify(`Вклад активирован — начислено ${bonus} SURc`);
+      return stake;
+    }
 
-      useEffect(()=> write(LS.USER, user), [user]);
-      useEffect(()=> write(LS.BAL, balance), [balance]);
-      useEffect(()=> write(LS.STAKES, stakes), [stakes]);
-      useEffect(()=> write(LS.ADDR, addr), [addr]);
+    async function handlePayAndStake() {
+      if (!agree) { notify('Примите условия'); return; }
+      if (!amount || Number(amount) <= 0) { notify('Введите корректную сумму'); return; }
+      setStage('paying');
 
-      // Chart reference
-      let chartRef = null;
-
-      function notify(t, ms=3500){ setNotif(t); setTimeout(()=>setNotif(null), ms); }
-
-      async function initTonConnect(){
-        try {
-          const ton = new TonConnect({ manifestUrl: window.location.origin + '/manifest.json' });
-          setTc(ton);
-          ton.onAccountChanged?.((acc) => {
-            if (acc?.address) { setAddr(acc.address); setConnected(true); notify('Кошелёк: ' + short(acc.address)); }
-            else { setAddr(null); setConnected(false); }
-          });
-          return ton;
-        } catch (e) {
-          console.warn('TonConnect init error', e);
-          notify('TonConnect недоступен');
-          return null;
-        }
+      // If internal token SURc - no blockchain transfer
+      if (token.id === 'surc') {
+        createStakeRecord({ tokenId:'surc', amount:Number(amount), days:duration.days, from:'internal' });
+        setStage('staked');
+        return;
       }
 
-      async function connectTon(){
-        try {
-          const ton = tc || await initTonConnect();
-          if (!ton) { notify('TonConnect не доступен'); return; }
-          await ton.connect(); // открывает выбор кошелька
-          const a = ton.account?.address || null;
-          if (a) { setAddr(a); setConnected(true); notify('Подключено: ' + short(a)); }
-          else { setConnected(true); notify('Подключение запрошено (проверьте кошелек)'); }
-        } catch (e) { console.error(e); notify('Ошибка подключения'); }
-      }
-
-      function disconnect(){ try{ tc?.disconnect?.(); }catch{} setAddr(null); setConnected(false); setTc(null); notify('Отключено'); }
-
-      async function sendTon(amountDecimal){
-        if (!tc) { notify('Инициализируем TonConnect...'); await initTonConnect(); }
-        if (!tc) { notify('TonConnect не доступен'); return {ok:false}; }
-        try {
-          const messages = [{ address: MANUAL_WALLET, amount: amountDecimal.toString() }];
-          const res = await tc.sendTransaction({ messages });
-          return { ok:true, res };
-        } catch (e) { console.error(e); return { ok:false, e }; }
-      }
-
-      function finalizeStake({ tokenId, amount, durationDays, from }){
-        const idd = uid();
-        const created = Date.now();
-        const apy = duration.apyRange;
-        const est = estimateRewards(amount, apy, durationDays);
-        const finish = created + durationDays * 24*3600*1000;
-        const s = { id: idd, tokenId, amount, duration: durationDays, apy, est, created, finish, from, status:'active' };
-        setStakes(prev=> [s, ...prev].slice(0,200));
-        // credit SURc: 10x of staked amount for TON/USDT
-        const bonus = tokenId !== 'surc' ? (amount * 10) : 0;
-        setBalance(prev => ({ ...prev, SURc: round((prev.SURc||0) + bonus), fromStakes: round((prev.fromStakes||0)+bonus) }));
-        notify(`Вклад активирован — начислено ${bonus} SURc`);
-      }
-
-      async function handlePayAndStake(){
-        if (!agree) { notify('Примите условия'); return; }
-        if (!amount || Number(amount)<=0) { notify('Введите сумму > 0'); return; }
-        setStage('paying');
-
-        if (token.id === 'surc') {
-          finalizeStake({ tokenId:'surc', amount:Number(amount), durationDays: duration.days, from: 'internal' });
+      // Try TonConnect
+      if (ton) {
+        const res = await sendTon(Number(amount));
+        if (res.ok) {
+          createStakeRecord({ tokenId: token.id, amount: Number(amount), days: duration.days, from: addr || 'wallet' });
           setStage('staked');
           return;
+        } else {
+          notify('Оплата через кошелек не удалась — переключаем на ручную оплату');
         }
-
-        if (tc) {
-          const res = await sendTon(Number(amount));
-          if (res.ok) {
-            finalizeStake({ tokenId: token.id, amount: Number(amount), durationDays: duration.days, from: addr||'wallet' });
-            setStage('staked');
-            return;
-          } else {
-            notify('Оплата через кошелек не удалась — переключаем на ручной режим');
-          }
-        }
-
-        setStage('manual');
-        notify('Проведите ручной перевод на адрес и подтвердите');
       }
 
-      function confirmManual(){ finalizeStake({ tokenId: token.id, amount: Number(amount), durationDays: duration.days, from: 'manual' }); setStage('staked'); }
+      // fallback manual
+      setStage('manual');
+      notify('Ручная оплата: переведите средства на указанный адрес и подтвердите');
+    }
 
-      // referral & subscription
-      function applyReferral(code){
-        if (!code) return notify('Введите код');
-        if (user.referer) return notify('Реферал уже применён');
-        setUser(prev=> ({ ...prev, referer: code }));
-        setBalance(prev=> ({ ...prev, SURc: (prev.SURc||0)+100, fromRef: (prev.fromRef||0)+100 }));
-        notify('Реферальный бонус: +100 SURc');
+    function confirmManualPaid() {
+      createStakeRecord({ tokenId: token.id, amount: Number(amount), days: duration.days, from: 'manual' });
+      setStage('staked');
+    }
+
+    function applyReferral(code) {
+      if (!code) { notify('Введите код'); return; }
+      if (user.referer) { notify('Реферал уже применён'); return; }
+      setUser(prev => ({ ...prev, referer: code }));
+      setBalance(prev => ({ ...prev, SURc: (prev.SURc||0) + 100, fromRef: (prev.fromRef||0) + 100 }));
+      notify('Реферальный бонус: +100 SURc');
+    }
+
+    function applySubscription() {
+      if (user.subs) { notify('Уже подписаны'); return; }
+      setUser(prev => ({ ...prev, subs: true }));
+      setBalance(prev => ({ ...prev, SURc: (prev.SURc||0) + 50, fromSub: (prev.fromSub||0) + 50 }));
+      notify('Подписка подтверждена — +50 SURc');
+    }
+
+    // utility to compute remaining time
+    function timeLeft(finish) {
+      const diff = finish - Date.now();
+      if (diff <= 0) return 'завершено';
+      const d = Math.floor(diff / (24*3600*1000));
+      const h = Math.floor((diff % (24*3600*1000)) / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      return `${d}д ${h}ч ${m}м`;
+    }
+
+    // Chart update (simple demo)
+    useEffect(() => {
+      const ctx = document.getElementById('growthChart')?.getContext?.('2d');
+      if (!ctx) return;
+      const labels = Array.from({length: 6}, (_,i) => `T+${i*10}d`);
+      const growthRate = 0.02; // fake rate for demo
+      const base = Number(amount || 0);
+      const data = labels.map((l,i) => round(base * (1 + growthRate * i)));
+      if (window._growth_chart) {
+        window._growth_chart.data.labels = labels;
+        window._growth_chart.data.datasets[0].data = data;
+        window._growth_chart.update();
+      } else {
+        window._growth_chart = new Chart(ctx, {
+          type: 'line',
+          data: { labels, datasets: [{ label: 'Прогноз роста депозита', data, fill: true, tension: 0.3 }] },
+          options: { responsive:true, plugins:{ legend:{ display: false } }, scales:{ y:{ beginAtZero:true } } }
+        });
       }
-      function applySubscription(){
-        if (user.subs) return notify('Уже подписаны');
-        setUser(prev=> ({ ...prev, subs: true }));
-        setBalance(prev=> ({ ...prev, SURc: (prev.SURc||0)+50, fromSub: (prev.fromSub||0)+50 }));
-        notify('Подписка подтверждена — +50 SURc');
-      }
+    }, [amount]);
 
-      // Chart drawing
-      useEffect(()=> {
-        const ctx = document.getElementById('apyChart')?.getContext?.('2d');
-        if (!ctx) return;
-        const labels = ['Day 0','Day 10','Day 20','Day 30'];
-        const data = { labels, datasets: [{ label: 'Прогноз роста депозита', data: [0,  (amount*0.02), (amount*0.04), (amount*0.06) ], fill:true, tension:0.4 }] };
-        if (window._st_chart) { window._st_chart.data = data; window._st_chart.update(); return; }
-        window._st_chart = new Chart(ctx, { type:'line', data, options:{ responsive:true, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true } } } });
-      }, [amount]);
+    // Referral link
+    const refLink = `${window.location.origin}${window.location.pathname}?ref=${user.id}`;
 
-      // referral link
-      const refLink = `${window.location.origin}?ref=${user.id}`;
+    // reserve pool (10% locked for 100 days) — simple demo calculation
+    const totalLocked = stakes.reduce((s, x) => s + (x.amount * 0.1), 0); // 10% of each stake
+    const totalDistributed = balance.fromStakes + (balance.fromRef||0) + (balance.fromSub||0);
 
-      const est = useMemo(()=> estimateRewards(Number(amount||0), duration.apyRange, duration.days), [amount, duration]);
+    // periodic small tick to update timers
+    useEffect(() => {
+      const id = setInterval(()=> { /* trigger re-render for timers */ setNotif(n => n); }, 60_000);
+      return () => clearInterval(id);
+    }, []);
 
-      return React.createElement('div', { className:'max-w-6xl mx-auto' },
-        React.createElement(motion.header, { initial:{ y:-20, opacity:0 }, animate:{ y:0, opacity:1 }, className:'flex items-center justify-between mb-6' },
+    // Pages rendering
+    return (
+      React.createElement('div', { className: 'max-w-7xl mx-auto' },
+        // header
+        React.createElement(motion.header, { initial: { y:-20, opacity:0 }, animate: { y:0, opacity:1 }, className: 'flex items-center justify-between mb-6' },
           React.createElement('div', null,
-            React.createElement('h1', { className:'text-3xl font-bold' }, 'StakeUP Rocket — SURc Staking'),
-            React.createElement('p', { className:'text-sm text-slate-400' }, 'Короткие депозиты TON / USDT — подключение через TonConnect')
+            React.createElement('h1', { className: 'text-3xl font-bold tracking-tight' }, 'StakeUP Rocket 🚀'),
+            React.createElement('p', { className: 'text-sm text-slate-400' }, 'SURc staking — быстрые депозиты в TON / USDT с красивым UI')
           ),
-          React.createElement('div', { className:'flex items-center gap-4' },
-            React.createElement('div', { className:'text-right' },
-              React.createElement('div', { className:'text-xs text-slate-400' }, 'Баланс SURc'),
-              React.createElement('div', { className:'font-semibold' }, round(balance.SURc||0),' SURc')
+          React.createElement('div', { className: 'flex items-center gap-4' },
+            React.createElement('div', { className: 'text-right' },
+              React.createElement('div', { className: 'text-xs text-slate-400' }, 'Баланс SURc'),
+              React.createElement('div', { className: 'font-semibold' }, round(balance.SURc||0), ' SURc')
             ),
-            connected ? React.createElement('div', { className:'flex items-center gap-3' },
-              React.createElement('div', { className:'text-sm text-slate-300' }, short(addr||'wallet')),
-              React.createElement('button', { onClick:disconnect, className:'px-3 py-2 rounded-2xl bg-white/6' }, 'Отключить')
-            ) : React.createElement('div', { className:'flex gap-2' },
-              React.createElement('button', { onClick:connectTon, className:'px-4 py-2 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-500 shadow-lg' }, 'Подключить TON'),
-              React.createElement('button', { onClick:()=>{ setConnected(false); setAddr(null); notify('Ручной режим'); }, className:'px-4 py-2 rounded-2xl bg-white/6' }, 'Ручной')
+            connected ? (
+              React.createElement('div', { className: 'flex items-center gap-3' },
+                React.createElement('div', { className: 'text-sm text-slate-300' }, short(addr || 'wallet')),
+                React.createElement('button', { className: 'px-3 py-2 rounded-2xl bg-white/6', onClick: disconnectWallet }, 'Отключить')
+              )
+            ) : (
+              React.createElement('div', { className: 'flex gap-2' },
+                React.createElement('button', { onClick: connectWallet, className: 'px-4 py-2 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-500 shadow-lg' }, 'Подключить TON'),
+                React.createElement('button', { onClick: ()=> { notify('Ручной режим'); setConnected(false); setAddr(null); }, className: 'px-4 py-2 rounded-2xl bg-white/6' }, 'Ручной')
+              )
             )
           )
         ),
 
-        React.createElement('main', { className:'grid grid-cols-1 md:grid-cols-3 gap-6' },
-          // left: create stake
-          React.createElement(motion.section, { initial:{ x:-10, opacity:0 }, animate:{ x:0, opacity:1 }, className:'col-span-2 bg-[#071428]/60 p-6 rounded-2xl' },
-            React.createElement('h2', { className:'text-xl font-semibold mb-4' }, 'Создать вклад'),
-            React.createElement('div', { className:'grid grid-cols-1 md:grid-cols-3 gap-3 mb-4' },
+        // main grid
+        React.createElement('main', { className: 'grid grid-cols-1 md:grid-cols-3 gap-6' },
+          // left - staking panel
+          React.createElement(motion.section, { initial: { x:-10, opacity:0 }, animate: { x:0, opacity:1 }, className: 'col-span-2 bg-[#071428]/60 p-6 rounded-2xl glass' },
+            React.createElement('div', { className: 'flex items-center justify-between mb-4' },
+              React.createElement('h2', { className: 'text-xl font-semibold' }, 'Создать вклад'),
+              React.createElement('div', { className: 'text-xs text-slate-400' }, 'SURc — внутренняя монета, в скором листинг')
+            ),
+
+            React.createElement('div', { className: 'grid grid-cols-1 md:grid-cols-3 gap-3 mb-4' },
               TOKENS.map(t => React.createElement('button', {
-                key:t.id, onClick:()=>setToken(t), className:`p-3 rounded-xl text-left border ${token.id===t.id ? 'border-indigo-400 bg-indigo-900/20' : 'bg-white/2 border-transparent'}`
+                key:t.id, onClick: ()=> setToken(t),
+                className: `p-3 rounded-xl text-left border ${token.id === t.id ? 'border-indigo-400 bg-indigo-900/20' : 'bg-white/2 border-transparent'}`
               }, React.createElement('div',{className:'font-medium'}, t.name), React.createElement('div',{className:'text-xs text-slate-400'}, `Мин: ${t.min} ${t.symbol}`)))
             ),
-            React.createElement('div',{className:'mb-4'}, React.createElement('label',{className:'text-sm text-slate-300'}, `Сумма (${token.symbol})`),
-              React.createElement('input',{ type:'number', min:0, step:'any', value:amount, onChange:e=>setAmount(e.target.value), className:'mt-2 w-full rounded-2xl bg-transparent border border-white/6 p-3' })
-            ),
-            React.createElement('div',{className:'mb-4'}, React.createElement('label',{className:'text-sm text-slate-300'}, 'Срок'),
-              React.createElement('div',{className:'flex gap-3 mt-2'}, DURATIONS.map(d=> React.createElement('button',{ key:d.days, onClick:()=>setDuration(d), className:`px-3 py-2 rounded-lg ${duration.days===d.days ? 'bg-indigo-500/30' : 'bg-white/2'}` }, React.createElement('div',{className:'text-sm font-medium'}, d.label), React.createElement('div',{className:'text-xs text-slate-400'}, d.apyRange, ' APY'))))
-            ),
 
-            React.createElement('div',{className:'mb-4 p-4 rounded-2xl bg-gradient-to-r from-[#071428] to-[#061222] border border-white/6'}, 
-              React.createElement('div',{className:'flex justify-between items-center mb-2'}, React.createElement('div',{className:'text-xs text-slate-400'}, 'Оценка дохода'), React.createElement('div',{className:'text-sm text-slate-200'}, 'APY: ', duration.apyRange)),
-              React.createElement('div',{className:'text-2xl font-semibold'}, `${amount} ${token.symbol}`),
-              React.createElement('div',{className:'text-sm text-slate-400'}, `Ожидаемый доход: ${est} ${token.symbol}`)
+            React.createElement('div', { className: 'mb-4' },
+              React.createElement('label', { className: 'text-sm text-slate-300' }, `Сумма (${token.symbol})`),
+              React.createElement('input', {
+                className: 'mt-2 w-full rounded-2xl bg-transparent border border-white/6 p-3',
+                type: 'number', min:0, step: 'any', value: amount, onChange: e => setAmount(e.target.value)
+              })
             ),
 
-            React.createElement('div',{className:'mb-4'}, React.createElement('label',{className:'text-sm text-slate-300'}, 'Прогноз роста (график)'), React.createElement('canvas',{ id:'apyChart', className:'mt-2 w-full rounded bg-black/20 p-2' } )),
+            React.createElement('div', { className: 'mb-4' },
+              React.createElement('label', { className: 'text-sm text-slate-300' }, 'Срок'),
+              React.createElement('div', { className: 'flex gap-3 mt-2' },
+                DURATIONS.map(d => React.createElement('button', {
+                  key: d.days, onClick: ()=> setDuration(d),
+                  className: `px-3 py-2 rounded-lg ${duration.days === d.days ? 'bg-indigo-500/30' : 'bg-white/2'}`
+                }, React.createElement('div',{className:'text-sm font-medium'}, d.label), React.createElement('div',{className:'text-xs text-slate-400'}, d.apyRange,' APY')))
+              )
+            ),
 
-            React.createElement('div',{className:'flex items-start gap-3 mb-4'}, React.createElement('input',{id:'terms', type:'checkbox', checked:agree, onChange:e=>setAgree(e.target.checked)}), React.createElement('label',{htmlFor:'terms', className:'text-sm text-slate-300'}, 'Я согласен с правилами. Понимаю риски.')),
-            React.createElement('div',{className:'flex gap-3'}, React.createElement('button',{ onClick:handlePayAndStake, className:'flex-1 py-3 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-500 font-medium shadow-lg' }, 'Оплатить и активировать'), React.createElement('button',{ onClick:()=>{ setAmount(0); setAgree(false); notify('Сброшено'); }, className:'px-4 py-3 rounded-2xl bg-white/6' }, 'Сброс')),
+            React.createElement('div', { className: 'mb-4 p-4 rounded-2xl bg-gradient-to-r from-[#071428] to-[#061222] border border-white/6' },
+              React.createElement('div', { className: 'flex justify-between items-center mb-2' },
+                React.createElement('div', { className: 'text-xs text-slate-400' }, 'Оценка дохода'),
+                React.createElement('div', { className: 'text-sm text-slate-200' }, 'APY: ', duration.apyRange)
+              ),
+              React.createElement('div', { className: 'text-2xl font-semibold' }, `${amount} ${token.symbol}`),
+              React.createElement('div', { className: 'text-sm text-slate-400' }, `Ожидаемый доход: ${estimateRewards(Number(amount||0), duration.apyRange, duration.days)} ${token.symbol}`)
+            ),
 
-            stage==='manual' && React.createElement('div',{className:'mt-5 p-4 rounded-xl bg-[#071428]/30 border border-white/6'}, React.createElement('div',{className:'text-sm text-slate-300 mb-2'}, 'Переведите сумму на этот адрес вручную:'), React.createElement('div',{className:'p-3 bg-black/40 rounded mono break-words'}, MANUAL_WALLET), React.createElement('div',{className:'mt-3 flex gap-3'}, React.createElement('button',{onClick:confirmManual, className:'px-4 py-2 rounded-2xl bg-green-500'}, 'Я оплатил — подтвердить'), React.createElement('button',{onClick:()=>setStage('ready'), className:'px-4 py-2 rounded-2xl bg-white/6'}, 'Отмена'))),
+            React.createElement('div', { className: 'mb-4' },
+              React.createElement('label', { className: 'text-sm text-slate-300' }, 'Прогноз роста (демо)'),
+              React.createElement('canvas', { id: 'growthChart', className: 'mt-2 w-full rounded bg-black/20 p-2' })
+            ),
 
-            stage==='staked' && React.createElement('div',{className:'mt-5 p-4 rounded-2xl bg-gradient-to-r from-[#04202d] to-[#041722] border border-white/6'}, React.createElement('div',{className:'text-lg font-semibold'}, 'Вклад активирован'), React.createElement('div',{className:'text-sm text-slate-400'}, `Сумма: ${amount} ${token.symbol}`), React.createElement('div',{className:'text-sm text-slate-400'}, `Срок: ${duration.label}`), React.createElement('div',{className:'mt-3'}, React.createElement('button',{ onClick:()=>{ setStage('ready'); setAmount(0); notify('Готово'); }, className:'px-4 py-2 rounded-2xl bg-indigo-500' }, 'Создать новый вклад')))
+            React.createElement('div', { className: 'flex items-start gap-3 mb-4' },
+              React.createElement('input', { id: 'terms', type: 'checkbox', checked: agree, onChange: e => setAgree(e.target.checked) }),
+              React.createElement('label', { htmlFor: 'terms', className: 'text-sm text-slate-300' }, 'Я согласен с правилами проекта и понимаю риски.')
+            ),
 
+            React.createElement('div', { className: 'flex gap-3 mb-6' },
+              React.createElement('button', { onClick: handlePayAndStake, className: 'flex-1 py-3 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-500 font-medium shadow-lg' }, 'Оплатить и активировать'),
+              React.createElement('button', { onClick: ()=> { setAmount(0); setAgree(false); notify('Сброшено'); }, className: 'px-4 py-3 rounded-2xl bg-white/6' }, 'Сброс')
+            ),
+
+            // flows: manual or staked
+            stage === 'manual' && React.createElement('div', { className: 'mt-3 p-4 rounded-xl bg-[#071428]/30 border border-white/6' },
+              React.createElement('div', { className: 'text-sm text-slate-300 mb-2' }, 'Переведите сумму вручную на адрес:'),
+              React.createElement('div', { className: 'p-3 bg-black/40 rounded mono break-words' }, MANUAL_WALLET),
+              React.createElement('div', { className: 'mt-3 flex gap-3' },
+                React.createElement('button', { onClick: confirmManualPaid, className: 'px-4 py-2 rounded-2xl bg-green-500' }, 'Я оплатил — подтвердить'),
+                React.createElement('button', { onClick: ()=> setStage('ready'), className: 'px-4 py-2 rounded-2xl bg-white/6' }, 'Отмена')
+              )
+            ),
+
+            stage === 'staked' && React.createElement('div', { className: 'mt-3 p-4 rounded-2xl bg-gradient-to-r from-[#04202d] to-[#041722] border border-white/6' },
+              React.createElement('div', { className: 'text-lg font-semibold' }, 'Вклад активирован'),
+              React.createElement('div', { className: 'text-sm text-slate-400' }, `Сумма: ${amount} ${token.symbol}`),
+              React.createElement('div', { className: 'text-sm text-slate-400' }, `Срок: ${duration.label}`),
+              React.createElement('div', { className: 'mt-3' },
+                React.createElement('button', { onClick: ()=> { setStage('ready'); setAmount(0); notify('Готово'); }, className: 'px-4 py-2 rounded-2xl bg-indigo-500' }, 'Создать новый вклад')
+              )
+            )
           ),
 
-          // right: info, referrals, history, SURc info
-          React.createElement(motion.aside, { initial:{ x:10, opacity:0 }, animate:{ x:0, opacity:1 }, className:'col-span-1' },
-            React.createElement('div',{className:'p-4 rounded-2xl bg-[#071428]/60 border border-white/6 mb-4'}, React.createElement('h3',{className:'font-semibold'}, 'SURc — токен проекта'), React.createElement('div',{className:'text-sm text-slate-400 mt-2'}, 'SURc — внутренняя монета StakeUP. В скором времени будет листинг на бирже.'), React.createElement('div',{className:'mt-3 text-sm text-slate-300'}, 'Модель распределения:'), React.createElement('ul',{className:'mt-2 text-sm text-slate-400 list-disc list-inside'}, React.createElement('li',null,'90% — распределяется пользователям за стейки и бонусы.'), React.createElement('li',null,'10% — уходит в накопительный счёт (резерв) на 100 дней для долгосрочных выплат.')), React.createElement('div',{className:'mt-3 p-3 rounded bg-black/30'}, React.createElement('div',{className:'text-xs text-slate-300'}, 'Пользователи могут заработать до 90% от эмиссии путём участия в стейкинге. 10% блокируется в накопительном счёте на 100 дней.'))),
+          // right - info
+          React.createElement(motion.aside, { initial: { x:10, opacity:0 }, animate: { x:0, opacity:1 }, className: 'col-span-1' },
+            // SURc info
+            React.createElement('div', { className: 'p-4 rounded-2xl bg-[#071428]/60 border border-white/6 mb-4' },
+              React.createElement('h3', { className: 'font-semibold' }, 'SURc — внутренняя монета'),
+              React.createElement('div', { className: 'text-sm text-slate-400 mt-2' }, 'SURc — токен экосистемы StakeUP. В скором времени будет листинг на бирже.'),
+              React.createElement('div', { className: 'mt-3 text-sm text-slate-300' }, 'Модель распределения:'),
+              React.createElement('ul', { className: 'mt-2 text-sm text-slate-400 list-inside list-disc' },
+                React.createElement('li', null, '90% — распределяется пользователям (стейки, бонусы).'),
+                React.createElement('li', null, '10% — уходит в накопительный резерв на 100 дней для долгосрочных выплат.')
+              ),
+              React.createElement('div', { className: 'mt-3 p-3 rounded bg-black/30 text-xs text-slate-300' },
+                'Пользователи могут заработать до 90% частью эмиссии, 10% блокируется в резерв на 100 дней.'
+              )
+            ),
 
-            React.createElement('div',{className:'p-4 rounded-2xl bg-[#071428]/60 border border-white/6 mb-4'}, React.createElement('h3',{className:'font-semibold'}, 'Рефералы / Подписка'), React.createElement('div',{className:'text-sm text-slate-400 mt-2'}, 'Код реферала'), React.createElement('div',{className:'flex gap-2 mt-2'}, React.createElement('input',{ id:'refcode', className:'flex-1 rounded p-2 bg-transparent border border-white/6', placeholder:'Код (например: 4n6k)'}), React.createElement('button',{ onClick: ()=> applyReferral(document.getElementById('refcode')?.value), className:'px-3 rounded bg-indigo-500' }, 'Применить')), React.createElement('div',{className:'mt-3'}, React.createElement('button',{ onClick: applySubscription, className:'w-full px-3 py-2 rounded bg-emerald-500' }, 'Подтвердить подписку на канал'), React.createElement('a',{ className:'block mt-2 text-xs text-slate-400', href: TELEGRAM_CHANNEL, target:'_blank', rel:'noreferrer'}, 'Перейти в канал и подписаться'))),
+            // referral & subscription
+            React.createElement('div', { className: 'p-4 rounded-2xl bg-[#071428]/60 border border-white/6 mb-4' },
+              React.createElement('h3', { className: 'font-semibold' }, 'Рефералы / Подписка'),
+              React.createElement('div', { className: 'text-sm text-slate-400 mt-2' }, 'Код реферала'),
+              React.createElement('div', { className: 'flex gap-2 mt-2' },
+                React.createElement('input', { id: 'refbox', className: 'flex-1 rounded p-2 bg-transparent border border-white/6', placeholder: 'Код (например: 4n6k)' }),
+                React.createElement('button', { onClick: ()=> applyReferral(document.getElementById('refbox')?.value), className: 'px-3 rounded bg-indigo-500' }, 'Применить')
+              ),
+              React.createElement('div', { className: 'mt-3' },
+                React.createElement('button', { onClick: applySubscription, className: 'w-full px-3 py-2 rounded bg-emerald-500' }, 'Подтвердить подписку на канал'),
+                React.createElement('a', { className: 'block mt-2 text-xs text-slate-400', href: TELEGRAM_CHANNEL, target: '_blank', rel: 'noreferrer' }, 'Перейти в канал и подписаться')
+              )
+            ),
 
-            React.createElement('div',{className:'p-4 rounded-2xl bg-[#071428]/60 border border-white/6'}, React.createElement('h3',{className:'font-semibold'}, 'История'), React.createElement('div',{className:'mt-2 text-sm text-slate-400'}, 'Последние вклады'), React.createElement('ul',{className:'mt-3 space-y-2'}, stakes.length===0 ? React.createElement('li',{className:'text-sm text-slate-400'}, 'История пуста') : stakes.slice(0,6).map(s=> React.createElement('li',{key:s.id, className:'text-sm bg-white/3 p-2 rounded flex justify-between'}, React.createElement('div',null, `${s.amount} ${s.tokenId.toUpperCase()}`), React.createElement('div',{className:'text-xs text-slate-300'}, `${s.duration}d`))))),
+            // history
+            React.createElement('div', { className: 'p-4 rounded-2xl bg-[#071428]/60 border border-white/6 mb-4' },
+              React.createElement('h3', { className: 'font-semibold' }, 'История вкладов'),
+              React.createElement('div', { className: 'mt-2 text-sm text-slate-400' }, 'Последние операции (локальная база)'),
+              React.createElement('ul', { className: 'mt-3 space-y-2' },
+                stakes.length === 0 ? React.createElement('li', { className: 'text-sm text-slate-400' }, 'История пуста') :
+                  stakes.slice(0,6).map(s => React.createElement('li', { key: s.id, className: 'text-sm bg-white/3 p-2 rounded flex flex-col' },
+                    React.createElement('div', { className: 'flex justify-between' }, React.createElement('div', null, `${s.amount} ${s.tokenId.toUpperCase()}`), React.createElement('div', { className: 'text-xs text-slate-300' }, `${s.days}д`)),
+                    React.createElement('div', { className: 'text-xs text-slate-400 mt-1' }, `Статус: ${s.status}`),
+                    React.createElement('div', { className: 'text-xs text-slate-400 mt-1' }, `Оставшееся: ${timeLeft(s.finish)}`)
+                  ))
+              )
+            ),
 
-            React.createElement('div',{className:'p-4 rounded-2xl bg-[#071428]/60 border border-white/6 mt-4'}, React.createElement('h3',{className:'font-semibold'}, 'Статистика SURc'), React.createElement('div',{className:'text-sm text-slate-400 mt-2'}, `Начислено за стейки: ${round(balance.fromStakes||0)} SURc`), React.createElement('div',{className:'text-sm text-slate-400'}, `От рефералов: ${round(balance.fromRef||0)} SURc`), React.createElement('div',{className:'text-sm text-slate-400'}, `За подписки: ${round(balance.fromSub||0)} SURc`), React.createElement('div',{className:'mt-2 text-xs text-slate-300'}, 'Реферальная ссылка: '), React.createElement('div',{className:'mono mt-1 break-words bg-black/20 p-2 rounded'}, `${window.location.origin}?ref=${user.id}`))
+            // stats SURc
+            React.createElement('div', { className: 'p-4 rounded-2xl bg-[#071428]/60 border border-white/6' },
+              React.createElement('h3', { className: 'font-semibold' }, 'Статистика SURc'),
+              React.createElement('div', { className: 'text-sm text-slate-400 mt-2' }, `Начислено за стейки: ${round(balance.fromStakes||0)} SURc`),
+              React.createElement('div', { className: 'text-sm text-slate-400' }, `От рефералов: ${round(balance.fromRef||0)} SURc`),
+              React.createElement('div', { className: 'text-sm text-slate-400' }, `За подписки: ${round(balance.fromSub||0)} SURc`),
+              React.createElement('div', { className: 'mt-2 text-xs text-slate-300' }, 'Реферальная ссылка:'),
+              React.createElement('div', { className: 'mono mt-1 break-words bg-black/20 p-2 rounded text-xs' }, refLink)
+            )
           )
         ),
 
-        // footer + notifications
-        React.createElement('footer',{ className:'mt-8 text-center text-xs text-slate-500' }, 'StakeUP Rocket — демонстрация. Для продакшена: серверная проверка транзакций и безопасность.'),
+        // footer
+        React.createElement('footer', { className: 'mt-8 text-center text-xs text-slate-500' }, 'StakeUP Rocket — demo. На продакшне обязательно серверная проверка транзакций.'),
 
-        notif && React.createElement('div',{ className:'fixed left-1/2 -translate-x-1/2 bottom-8 bg-indigo-600/90 px-4 py-2 rounded-2xl shadow-lg' }, notif)
+        // notification
+        notif && React.createElement('div', { className: 'fixed left-1/2 -translate-x-1/2 bottom-8 bg-indigo-600/90 px-4 py-2 rounded-2xl shadow-lg' }, notif)
       );
     }
 
+    // mount app
     const root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(React.createElement(App));
   </script>
